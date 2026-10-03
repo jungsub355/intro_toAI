@@ -6,6 +6,7 @@ load fisheriris;
 setdata = [];
 setdata = meas(:,1:2); %3:4 % 1:4
 
+% 종별 번호할당
 spcs2num = [];
 for k=1:1:length(species)
     if strcmp(species(k), 'setosa') == 1
