@@ -101,8 +101,8 @@ end
 %%
 
 figure;
-subplot(311); bar(mat_label); axis tight;
-subplot(312); bar(Final_label); axis tight;
+subplot(311); bar(mat_label); axis tight; title('내부함수');
+subplot(312); bar(Final_label); axis tight; title('구현함수');
 subplot(313); bar(mat_label-Final_label); axis tight;
 
 my_CP
