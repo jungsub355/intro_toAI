@@ -31,13 +31,68 @@ RAW_DATA = [
     ("versicolor", 6.5, 2.8, 4.6, 1.5),
 ]
 
+# 데이터 50개로 늘리기
+
+RAW_DATA_50 = [
+    ("setosa",     5.1, 3.5, 1.4, 0.2),
+    ("setosa",     4.9, 3.0, 1.4, 0.2),
+    ("setosa",     4.7, 3.2, 1.3, 0.2),
+    ("setosa",     5.0, 3.6, 1.4, 0.2),
+    ("setosa",     5.4, 3.9, 1.7, 0.4),
+    ("versicolor", 7.0, 3.2, 4.7, 1.4),
+    ("versicolor", 6.4, 3.2, 4.5, 1.5),
+    ("versicolor", 6.9, 3.1, 4.9, 1.5),
+    ("versicolor", 5.5, 2.3, 4.0, 1.3),
+    ("versicolor", 6.5, 2.8, 4.6, 1.5),
+    ('setosa',     5.4, 3.7, 1.5, 0.2),
+    ('setosa',     4.8, 3.4, 1.6, 0.2),
+    ('setosa',     4.8, 3, 1.4, 0.1),
+    ('setosa',     4.3, 3, 1.1, 0.1),
+    ('setosa',     5.8, 4, 1.2, 0.2),
+    ('setosa',     5.7, 4.4, 1.5, 0.4),
+    ('setosa',     5.4, 3.9, 1.3, 0.4),
+    ('setosa',     5.1, 3.5, 1.4, 0.3),
+    ('setosa',     5.7, 3.8, 1.7, 0.3),
+    ('setosa',     5.1, 3.8, 1.5, 0.3),
+    ('setosa',     5.4, 3.4, 1.7, 0.2),
+    ('setosa',     5.1, 3.7, 1.5, 0.4),
+    ('setosa',     4.6, 3.6, 1, 0.2),
+    ('setosa',     5.1, 3.3, 1.7, 0.5),
+    ('setosa',     4.8, 3.4, 1.9, 0.2),
+    ('versicolor', 7, 3.2, 4.7, 1.4),
+    ('versicolor', 6.4, 3.2, 4.5, 1.5),
+    ('versicolor', 6.9, 3.1, 4.9, 1.5),
+    ('versicolor', 5.5, 2.3, 4, 1.3),
+    ('versicolor', 6.5, 2.8, 4.6, 1.5),
+    ('versicolor', 5.7, 2.8, 4.5, 1.3),
+    ('versicolor', 6.3, 3.3, 4.7, 1.6),
+    ('versicolor', 4.9, 2.4, 3.3, 1),
+    ('versicolor', 6.6, 2.9, 4.6, 1.3),
+    ('versicolor', 5.2, 2.7, 3.9, 1.4),
+    ('versicolor', 5, 2, 3.5, 1),
+    ('versicolor', 5.9, 3, 4.2, 1.5),
+    ('versicolor', 6, 2.2, 4, 1),
+    ('versicolor', 6.1, 2.9, 4.7, 1.4),
+    ('versicolor', 5.6, 2.9, 3.6, 1.3),
+    ('versicolor', 6.7, 3.1, 4.4, 1.4),
+    ('versicolor', 5.6, 3, 4.5, 1.5),
+    ('versicolor', 5.8, 2.7, 4.1, 1),
+    ('versicolor', 6.2, 2.2, 4.5, 1.5),
+    ('versicolor', 5.6, 2.5, 3.9, 1.1),
+    ('versicolor', 5.9, 3.2, 4.8, 1.8),
+    ('versicolor', 6.1, 2.8, 4, 1.3),
+    ('versicolor', 6.3, 2.5, 4.9, 1.5),
+    ('versicolor', 6.1, 2.8, 4.7, 1.2),
+    ('versicolor', 6.4, 2.9, 4.3, 1.3)
+]
+
 LABEL_OF = {"setosa": -1, "versicolor": +1}
 
 
 def load_data(feature_idx=(0, 1, 2, 3)):
     """(X, t, 품종이름) 을 돌려준다. feature_idx 로 쓸 특징을 고를 수 있다."""
     X, t, names = [], [], []
-    for row in RAW_DATA:
+    for row in RAW_DATA_50:
         species, values = row[0], row[1:]
         X.append([values[i] for i in feature_idx])
         t.append(LABEL_OF[species])
@@ -166,6 +221,42 @@ def run(feature_idx, title, lr=0.01, epochs=50, seed=0):
     print()
     return model
 
+# 사이킷런 iris 사용
+import pandas as pd
+from sklearn.datasets import load_iris
+
+def run_sklearn_iris():
+    iris = load_iris(as_frame=True)
+    df = iris.frame
+    df["species"] = iris.target_names[iris.target]
+    df = df[df["species"].isin(list(LABEL_OF))]      # setosa 50 + versicolor 50
+
+    feature_idx = (0, 1, 2, 3)
+    X = df.iloc[:, list(feature_idx)].values.tolist()
+    t = df["species"].map(LABEL_OF).tolist()
+    names = df["species"].tolist()
+
+    print("=" * 78)
+    print("사이킷런 iris 퍼셉트론 — 특징 4개, 100개")
+    print("=" * 78)
+    model = Perceptron(n_features=len(feature_idx), lr=0.01, seed=0)
+    model.fit(X, t, epochs=50)
+    print_equation(model, feature_idx)
+    print_table(model, X, t, names, feature_idx)
+    print(f"[정확도]  {model.accuracy(X, t) * 100:.1f}%  ({len(t)}개)")
+
+    print("\n[새로운 꽃 판정하기]")
+    new_flowers = [
+        ("A", [5.2, 3.4, 1.5, 0.2]),
+        ("B", [6.3, 2.9, 4.4, 1.4]),
+        ("C", [5.8, 3.0, 3.0, 0.9]),  # 경계 근처
+    ]
+    for label, x in new_flowers:
+        s = model.net_input(x)
+        y = model.step(s)
+        species = "versicolor" if y > 0 else "setosa"
+        print(f"  꽃 {label}  {x}  →  s = {s:+.3f}  →  {species}")
+    print()
 
 def main():
     # (1) 특징 4개를 모두 사용
@@ -205,6 +296,10 @@ def main():
         print(f"  꽃 {label}  {x}  →  s = {s:+.3f}  →  {species}")
     print()
 
+    # 사이킷런 활용해서 구현해보기
+    run_sklearn_iris()
+
 
 if __name__ == "__main__":
     main()
+
